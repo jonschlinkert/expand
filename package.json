@@ -1,0 +1,24 @@
+{
+  "name": "expand",
+  "version": "0.0.1",
+  "description": "Expand lodash templates into objects.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/assemble/expand.git"
+  },
+  "keywords": [
+    "lodash",
+    "templates",
+    "expand",
+    "assemble"
+  ],
+  "author": "Brian Woodward",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/assemble/expand/issues"
+  }
+}
