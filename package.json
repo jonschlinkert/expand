@@ -20,5 +20,13 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/assemble/expand/issues"
+  },
+  "dependencies": {
+    "lodash": "~2.4.1",
+    "traverse": "~0.6.6"
+  },
+  "devDependencies": {
+    "mocha": "~1.16.2",
+    "chai": "~1.8.1"
   }
 }

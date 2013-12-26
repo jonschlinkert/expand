@@ -36,14 +36,14 @@ expand.process = function(obj) {
 		
 		// if the value is a string, check for template patterns
 		if (_.isString(o)) {
-			
+
 			// if this is a normal template '<%= foo %>' or '<%= foo.baz %>'
 			if(matches = o.match(tmplRegex)) {
-				
+
 				this.update(expand.getRaw(obj, matches[1]));
 			} else if (matches = o.match(fnTmplRegex)) {
 				// otherwise, if this is a template calling a function '<%= _.foo() %>'
-				
+
 				// this code is inspired by the internal lodash template engine.
 				// this creates a new function taking in parameters for the
 				// context (our object) and lodash so we can execute normally.
@@ -60,11 +60,12 @@ expand.process = function(obj) {
 };
 
 expand.get = function(obj, path) {
-	return traverse(process(obj)).get(path.split('.'));
+	return traverse(expand.process(obj)).get(path.split('.'));
 };
 
 expand.set = function(obj, path, value) {
-	return traverse(process(obj)).set(path.split('.'), value);
+	//return traverse(expand.process(obj)).set(path.split('.'), value);
+	return expand.setRaw(obj, path, value);
 };
 
 expand.getRaw = function(obj, path) {
