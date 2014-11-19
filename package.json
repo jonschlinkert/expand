@@ -22,11 +22,25 @@
     "url": "https://github.com/assemble/expand/issues"
   },
   "dependencies": {
+    "get-object": "^0.1.3",
+    "get-value": "^0.3.2",
     "lodash": "~2.4.1",
+    "set-object": "^0.1.0",
     "traverse": "~0.6.6"
   },
   "devDependencies": {
-    "mocha": "~1.16.2",
-    "chai": "~1.8.1"
+    "mocha": "*",
+    "chai": "~1.8.1",
+    "should": "*"
+  },
+  "homepage": "https://github.com/jonschlinkert/expand",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/jonschlinkert/expand/blob/master/LICENSE-MIT"
+    }
+  ],
+  "engines": {
+    "node": ">=0.10.0"
   }
 }

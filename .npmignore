@@ -1,3 +1,9 @@
 /node_modules/
+*.sublime-*
+temp
+tmp
+vendor
+
+# npmignore
 /test/
 .gitignore
