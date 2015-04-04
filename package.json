@@ -1,46 +1,35 @@
 {
   "name": "expand",
-  "version": "0.0.1",
-  "description": "Expand lodash templates into objects.",
-  "main": "index.js",
-  "scripts": {
-    "test": "mocha"
+  "description": "Recursively expand config values in an an object or string.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/jonschlinkert/expand",
+  "author": {
+    "name": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/assemble/expand.git"
+    "url": "git://github.com/jonschlinkert/expand.git"
   },
-  "keywords": [
-    "lodash",
-    "templates",
-    "expand",
-    "assemble"
-  ],
-  "author": "Brian Woodward",
-  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/assemble/expand/issues"
+    "url": "https://github.com/jonschlinkert/expand/issues"
   },
-  "dependencies": {
-    "get-object": "^0.1.3",
-    "get-value": "^0.3.2",
-    "lodash": "~2.4.1",
-    "set-object": "^0.1.0",
-    "traverse": "~0.6.6"
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/jonschlinkert/expand/blob/master/LICENSE"
+  },
+  "files": [
+    "index.js"
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
   },
   "devDependencies": {
     "mocha": "*",
-    "chai": "~1.8.1",
     "should": "*"
-  },
-  "homepage": "https://github.com/jonschlinkert/expand",
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/jonschlinkert/expand/blob/master/LICENSE-MIT"
-    }
-  ],
-  "engines": {
-    "node": ">=0.10.0"
   }
 }
