@@ -1,151 +1,116 @@
 'use strict';
 
 var get = require('get-value');
-var set = require('set-value');
-var isObject = require('is-plain-object');
-var template = require('lodash')._.template;
+var isPrimitive = require('is-primitive');
+var typeOf = require('kind-of');
+var engine = require('engine')();
 
-function expand(value, context, settings) {
-  if (value == null) {
-    throw new TypeError('expand expects a string, array or object.');
-  }
+var regex = /\$\{([^\\}]*(?:\\.[^\\}]*)*)\}|<%=([\s\S]+?)%>/gi;
 
-  if (arguments.length === 1) {
-    context = value;
-  }
-
-  var fn = expand.render(context, settings);
-
-  if (typeof value === 'string') {
-    if (!has(value, '<%') && !has(value, '${')) {
-      var res = get(context, value);
-      if (res) {
-        return expand(res, context);
-      }
-      return value;
-    }
-    return fn(value);
-  }
-
-  if (Array.isArray(value)) {
-    var len = value.length;
-    while (len--) {
-      value[len] = expand(value[len], context, settings);
-    }
-    return value;
-  }
-
-  if (!isObject(value)) {
-    throw new TypeError('expand expects a string, array or object.');
-  }
-
-  var o = {};
-  for (var key in value) {
-    if (value.hasOwnProperty(key)) {
-      var val = value[key];
-      if (typeof val === 'string') {
-        set(o, key, fn(val));
-      } else if (typeof val === 'object') {
-        set(o, key, expand(val, context));
-      }
-    }
-  }
-  return o;
+function expand(val, data, options) {
+  return resolve(val, data || val, options);
 }
 
-expand.render = function render_(context, settings) {
-  var re = /(?:<%=\s*([\w._]*?)\s*%>|\${\s*([\w._]*?)\s*})\s*/g;
-  return function (str) {
-    var prop, res;
+expand.parent = [];
 
-    str.replace(re, function (match, $1, $2) {
-      if (!match || match === str) {
-        prop = ($1 || $2);
-        return '';
-      }
-      res = match;
-    });
-
-    res = res || str;
-    if (prop) {
-      res = get(context, prop);
-      if (typeof res === 'string') {
-        return expand(res, context, settings);
-      }
-    }
-
-    // strings
-    if (typeof res === 'string') {
-      return expandString(str, context, settings)
-    }
-    // objects
-    if (typeof res === 'object') {
-      return expandObject(res, context, settings);
-    }
-    return res;
-  };
-}
-
-expand.get = function get_(prop, obj) {
-  return get(expand(obj, obj), prop);
+expand.get = function (key, data) {
+  return expand(get(data, key) || key, data);
 };
 
-/**
- * Recursively resolve templates.
- *
- * @param  {String} `str`
- * @param  {Object} `data`
- * @param  {Object} `settings`
- * @return {String}
- */
-
-expand.interpolate = function interpolate_(str, data, settings) {
-  if (typeof str !== 'string') {
-    throw new TypeError('interpolate expects a string.');
+function render(str, data, opts) {
+  try {
+    var val = engine.render(str, data, opts);
+    if (val === str) return val;
+    return render(val, data, opts);
+  } catch(err) {
+    console.log(err);
   }
-  while (has(str, '<%') || has(str, '${')) {
-    var last = str;
-    str = template(str, settings)(data);
-    if (str === last) { return str; }
-  }
-  return str;
-};
-
-function expandString(str, context, settings) {
-  // helpers
-  if (has(str, '<%') || has(str, '${')) {
-    str = expand.interpolate(str, context, settings);
-  }
-  // expand array syntax
-  if (str.charAt(0) === '[' && str[str.length - 1] === ']') {
-    return str.slice(1, str.length - 1).split(',');
-  }
-  return str;
 }
 
-function expandObject(obj, context, settings) {
+function resolve(val, data, options) {
+  switch(typeOf(val)) {
+    case 'function':
+      return val;
+    case 'string':
+      return resolveString(val, data, options);
+    case 'object':
+      return resolveObject(val, data, options);
+    case 'array':
+      return resolveArray(val, data, options);
+    default: {
+      return val;
+    }
+  }
+}
+
+function resolveString(str, data, options) {
+  var result = str;
+
+  str.replace(regex, function (match, es6, erb) {
+    var prop = trim(es6 || erb);
+    var val;
+
+    if (/\(.*\)/.test(prop)) {
+      val = render(match, data, options);
+    } else {
+      val = get(data, prop.trim());
+    }
+
+    if (isPrimitive(val)) {
+      if (str.length > match.length) {
+        result = str.split(match).join(val);
+      } else {
+        result = val;
+      }
+    } else if (val) {
+      result = resolve(val, data);
+    }
+
+    // if (/[()]/.test(prop)) {
+    //   var val = render(match, data, options);
+    //   if (val) result = str.split(match).join(val);
+    // } else {
+    //   var m;
+    //   if (m = /(?:\.\.\/|parent)/.exec(prop)) {
+    //     prop = prop.split(m[0]).join('parent.');
+    //     var val = get(expand.parent.pop(), prop);
+    //     if (val) result = str.split(match).join(val);
+    //   } else {
+    //     var parts = prop.split('.');
+    //     parts.pop();
+    //     expand.parent.push(get(data, parts.join('.')));
+    //   }
+
+    //   if (result === str) {
+    //     result = get(data, prop);
+    //   }
+
+    //   if (typeof result !== 'string' || /<%|${/.test(result)) {
+    //     result = resolve(data, result, options);
+    //   }
+    // }
+  });
+  return result;
+}
+
+function resolveArray(arr, data, options) {
+  return arr.map(function (val) {
+    return resolve(val, data, options);
+  });
+}
+
+function resolveObject(obj, data, options) {
+  var result = {};
   for (var key in obj) {
     if (obj.hasOwnProperty(key)) {
-      obj[key] = expand(obj[key], context, settings);
+      result[key] = resolve(obj[key], data, options);
     }
   }
-  return obj;
+  return result;
 }
 
-/**
- * Returns true if `str` has the given `characters`
- *
- * @param  {String} `str`
- * @param  {String} `ch` Characters to search for
- * @return {Boolean}
- */
-
-function has(str, ch) {
-  return str.indexOf(ch) !== -1;
+function trim(str) {
+  return str == null ? '' : str.trim();
 }
-
-/**
- * Expose `expand`
- */
 
 module.exports = expand;

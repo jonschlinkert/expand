@@ -10,30 +10,34 @@
 require('should');
 var util = require('util');
 var assert = require('assert');
-var set = require('set-value');
 var expand = require('..');
 
 describe('expand', function() {
   it('should expand values in a string.', function() {
-    var one = {'a.b': {c: 'd'}};
-    var two = {'a.b.c': 'd'};
-    expand(one).a.b.should.have.property('c');
-    expand(two).a.b.should.have.property('c');
+    var one = {a: {b: {c: 'd'}}};
+    var two = {foo: '<%= a.b.c %>'};
+    expand(two, one).foo.should.equal('d');
   });
 
-  it('should process templates.', function() {
-    var one = {'a.b': {c: '<%= d %>'}, d: {f: 'g'}};
-    expand(one).a.b.should.eql({c: {f: 'g'}});
+  it('should process templates in a value.', function() {
+    var one = {a: {c: '<%= d %>'}, d: {f: 'g'}};
+    expand(one).a.c.should.eql({f: 'g'});
   });
 
-  it('should use a custom function to resolve values:', function() {
-    var ctx = {a: 'one', b: 'two', c: {d: {e: 'f'}}};
-    var actual = expand({'c.d.e': 'abc <%= a %> xyz'}, ctx);
-    actual.should.eql({c: {d: {e: 'abc one xyz'}}});
+  it.only('should process multiple templates in a string.', function() {
+    var str = '<%= a %>/<%= b %>';
+    expand(str, {a: 'foo', b: 'bar'}).should.equal('foo/bar');
+  });
+
+  it('should call helpers in templates:', function() {
+    var ctx = {foo: 'bar', c: {d: {e: function (str) {
+      return str.toUpperCase();
+    }}}};
+    expand('abc <%= c.d.e(foo) %> xyz', ctx).should.eql('abc BAR xyz');
   });
 
   it('should process nested templates recursively', function() {
-    var actual = expand('c.e', {
+    var actual = expand('<%= c.e %>', {
       a: 1,
       b: 2,
       c: {
@@ -46,16 +50,8 @@ describe('expand', function() {
           g: 7
         }]
       },
-      // fn: '<%= _.extend({z: 0}, {z: 42}, {z: c.d}, 1, "a", \'a\') %>'
     });
-    console.log(actual)
-    // actual.should.eql([{
-    //   foo: [3, 4, 5, "bar => 1"]
-    // }, {
-    //   f: 6
-    // }, {
-    //   g: 7
-    // }]);
-  });
 
+    actual.should.eql([{foo: [3, 4, 5, "bar => 1"] }, {f: 6 }, {g: 7 }]);
+  });
 });
