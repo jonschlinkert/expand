@@ -23,23 +23,43 @@
     "engine": "^0.1.5",
     "get-value": "^1.1.5",
     "is-primitive": "^2.0.0",
-    "kind-of": "^2.0.1"
+    "kind-of": "^2.0.1",
+    "lazy-cache": "^0.2.3"
   },
   "devDependencies": {
-    "mocha": "*",
-    "should": "*"
+    "mocha": "*"
   },
   "keywords": [
     "config",
+    "declarative",
+    "dot",
+    "dot-notation",
     "expand",
     "filepath",
-    "fp",
     "lodash",
+    "nested",
+    "notation",
     "path",
     "placeholder",
+    "prop",
+    "property",
+    "resolve",
+    "string",
     "template",
     "underscore",
     "value",
     "variable"
-  ]
+  ],
+  "verb": {
+    "related": {
+      "list": [
+        "expander",
+        "expand-object",
+        "expand-config"
+      ]
+    },
+    "reflinks": {
+      "list": "expander"
+    }
+  }
 }
