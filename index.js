@@ -1,11 +1,12 @@
 'use strict';
 
-var get = require('get-value');
-var isPrimitive = require('is-primitive');
-var typeOf = require('kind-of');
-var engine = require('engine')();
+var lazy = require('lazy-cache')(require);
+lazy('get-value', 'get');
+lazy('is-primitive', 'isPrimitive');
+lazy('kind-of', 'typeOf');
+lazy('engine');
 
-var regex = /\$\{([^\\}]*(?:\\.[^\\}]*)*)\}|<%=([\s\S]+?)%>/gi;
+var delimRegex = /\$\{([^\\}]*(?:\\.[^\\}]*)*)\}|<%=([\s\S]+?)%>/gi;
 
 function expand(val, data, options) {
   return resolve(val, data || val, options);
@@ -14,23 +15,24 @@ function expand(val, data, options) {
 expand.parent = [];
 
 expand.get = function (key, data) {
-  return expand(get(data, key) || key, data);
+  return expand(lazy.get(data, key) || key, data);
 };
 
 function render(str, data, opts) {
+  var engine = lazy.engine();
   try {
     var val = engine.render(str, data, opts);
     if (val === str) return val;
     return render(val, data, opts);
   } catch(err) {
-    console.log(err);
+    // don't throw, just inform the user
+    console.error(err);
+    return;
   }
 }
 
 function resolve(val, data, options) {
-  switch(typeOf(val)) {
-    case 'function':
-      return val;
+  switch(lazy.typeOf(val)) {
     case 'string':
       return resolveString(val, data, options);
     case 'object':
@@ -44,73 +46,62 @@ function resolve(val, data, options) {
 }
 
 function resolveString(str, data, options) {
+  options = options || {};
+  var regex = options.regex || delimRegex;
   var result = str;
 
-  str.replace(regex, function (match, es6, erb) {
+  str.replace(regex, function (match, es6, erb, args) {
     var prop = trim(es6 || erb);
     var val;
 
     if (/\(.*\)/.test(prop)) {
-      val = render(match, data, options);
+      var m = '<%= ' + prop + ' %>';
+      val = render(m, data, options);
     } else {
-      val = get(data, prop.trim());
+      val = lazy.get(data, prop);
     }
 
-    if (isPrimitive(val)) {
+    if (lazy.isPrimitive(val)) {
       if (str.length > match.length) {
         result = str.split(match).join(val);
       } else {
         result = val;
       }
     } else if (val) {
-      result = resolve(val, data);
+      result = resolve(val, data, options);
     }
 
-    // if (/[()]/.test(prop)) {
-    //   var val = render(match, data, options);
-    //   if (val) result = str.split(match).join(val);
-    // } else {
-    //   var m;
-    //   if (m = /(?:\.\.\/|parent)/.exec(prop)) {
-    //     prop = prop.split(m[0]).join('parent.');
-    //     var val = get(expand.parent.pop(), prop);
-    //     if (val) result = str.split(match).join(val);
-    //   } else {
-    //     var parts = prop.split('.');
-    //     parts.pop();
-    //     expand.parent.push(get(data, parts.join('.')));
-    //   }
+    if (typeof result === 'string' && regex.test(result)) {
+      result = resolveString(result, data, options);
+    }
 
-    //   if (result === str) {
-    //     result = get(data, prop);
-    //   }
-
-    //   if (typeof result !== 'string' || /<%|${/.test(result)) {
-    //     result = resolve(data, result, options);
-    //   }
-    // }
+    str = result;
   });
-  return result;
+  return str;
 }
 
 function resolveArray(arr, data, options) {
-  return arr.map(function (val) {
-    return resolve(val, data, options);
-  });
+  var len = arr.length, i = -1;
+  var res = new Array(len);
+
+  while (++i < len) {
+    res[i] = resolve(arr[i], data, options);
+  }
+  return res;
 }
 
 function resolveObject(obj, data, options) {
-  var result = {};
+  var res = {};
   for (var key in obj) {
     if (obj.hasOwnProperty(key)) {
-      result[key] = resolve(obj[key], data, options);
+      res[key] = resolve(obj[key], data, options);
     }
   }
-  return result;
+  return res;
 }
 
 function trim(str) {
-  return str == null ? '' : str.trim();
+  return str == null ? '' : String(str).trim();
 }
 
 module.exports = expand;
