@@ -14,11 +14,18 @@ $ npm i expand --save
 
 ```js
 var expand = require('expand');
-expand({a: '<%= b %>', b: 'FOO'});
-//=> {a: 'FOO', b: 'FOO'}
+expand({a: '<%= b %>', b: 'c'});
+//=> {a: 'c', b: 'c'}
+
+expand({a: '<%= b.c.d %>', b: {c: {d: 'eee'}}});
+//=> {a: 'eee', b: {c: {d: 'eee' }}}
 ```
 
 **Params**
+
+```js
+expand(valueToExpand, dataToUse, options);
+```
 
 * `value` **{String|Array|Object}**: The value with templates to resolve.
 * `data` **{Object}**: Pass the data to use for resolving templates. If the first argument is an object, this is optional.
@@ -27,14 +34,7 @@ expand({a: '<%= b %>', b: 'FOO'});
 
 **Example**
 
-```js
-expand({a: '<%= b %>', b: 'FOO'});
-//=> {a: 'FOO', b: 'FOO'}
-```
-
-expand(valueToExpand, dataToUse, options);
-
-// if an object is passed, only the first argument is _necessary_
+If an object is passed, only the first argument is strictly _necessary_.
 
 ```js
 expand({a: '<%= b %>', b: '<%= c %>', c: 'It worked!'});

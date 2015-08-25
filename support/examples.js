@@ -1,8 +1,12 @@
-var expand = require('./');
+var expand = require('../');
+
+console.log(expand({a: '<%= b.c.d %>', b: {c: {d: 'eee'}}}))
+//=> { a: 'eee', b: { c: { d: 'eee' } } }
 
 /**
  * Examples
  */
+
 
 //
 expand({a: '<%= b %>', b: '<%= c %>', c: 'It worked!'});
