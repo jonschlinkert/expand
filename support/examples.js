@@ -6,7 +6,7 @@ var expand = require('./');
 
 //
 expand({a: '<%= b %>', b: '<%= c %>', c: 'It worked!'});
-//=>  a: 'It worked!', b: 'It worked!', c: 'It worked!' }
+//=> {a: 'It worked!', b: 'It worked!', c: 'It worked!'}
 
 // process templates in objects
 expand({a: {c: '<%= d %>'}, d: {f: 'g'}});
