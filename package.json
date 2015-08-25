@@ -45,9 +45,14 @@
   "verb": {
     "related": {
       "list": [
-        "expander",
-        "expand-object",
-        "expand-config"
+        "get-value",
+        "set-value",
+        "engine",
+        "glob-object",
+        "expand-object"
+      ],
+      "alternatives": [
+        "expander"
       ]
     },
     "reflinks": {
