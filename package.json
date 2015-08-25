@@ -10,7 +10,8 @@
   },
   "license": "MIT",
   "files": [
-    "index.js"
+    "index.js",
+    "utils.js"
   ],
   "main": "index.js",
   "engines": {
@@ -31,24 +32,15 @@
   },
   "keywords": [
     "config",
+    "configuration",
     "declarative",
     "dot",
     "dot-notation",
     "expand",
-    "filepath",
     "lodash",
-    "nested",
-    "notation",
-    "path",
-    "placeholder",
-    "prop",
-    "property",
     "resolve",
-    "string",
     "template",
-    "underscore",
-    "value",
-    "variable"
+    "underscore"
   ],
   "verb": {
     "related": {
