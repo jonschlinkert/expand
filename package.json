@@ -1,7 +1,7 @@
 {
   "name": "expand",
   "description": "Recursively resolve templates in an object, string or array.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/jonschlinkert/expand",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "jonschlinkert/expand",
