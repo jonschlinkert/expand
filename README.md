@@ -18,16 +18,12 @@ expand({a: '<%= b %>', b: 'FOO'});
 //=> {a: 'FOO', b: 'FOO'}
 ```
 
-### [expand](index.js#L25)
-
-Resolve templates in the given string, array or object.
-
 **Params**
 
 * `value` **{String|Array|Object}**: The value with templates to resolve.
-* `data` **{Object}**
-* `options` **{Object}**
-* `returns` **{any}**: Returns a string, object or array.
+* `data` **{Object}**: Pass the data to use for resolving templates. If the first argument is an object, this is optional.
+* `options` **{Object}**: Pass the regex to use for matching templates.
+* `returns` **{any}**: Returns a string, object or array based on what was passed.
 
 **Example**
 
@@ -35,3 +31,180 @@ Resolve templates in the given string, array or object.
 expand({a: '<%= b %>', b: 'FOO'});
 //=> {a: 'FOO', b: 'FOO'}
 ```
+
+expand(valueToExpand, dataToUse, options);
+
+// if an object is passed, only the first argument is _necessary_
+
+```js
+expand({a: '<%= b %>', b: '<%= c %>', c: 'It worked!'});
+//=> {a: 'It worked!', b: 'It worked!', c: 'It worked!'}
+```
+
+## More examples
+
+### process templates in objects
+
+```js
+expand({a: {c: '<%= d %>'}, d: {f: 'g'}});
+//=>  {a: {c: {f: 'g'}}, d: {f: 'g'}};
+```
+
+### process a template in an array
+
+```js
+expand(['<%= a %>'], {a: 'b'});
+//=> ['b']
+```
+
+### process templates in a string
+
+```js
+expand('<%= a %>', {a: 'b'});
+//=> 'b'
+```
+
+### process multiple templates in an array
+
+```js
+expand(['<%= a %>', '<%= b %>'], {a: 'b', b: 'c'});
+//=> ['b', 'c']
+```
+
+### expand nested templates in an object
+
+```js
+var data = {a: {b: {c: 'd'}}};
+expand({foo: '<%= a.b.c %>'}, data);
+//=> {foo: 'd'}
+```
+
+### recursively expand templates
+
+```js
+var data = {a: '<%= b %>', b: '<%= c %>', c: 'the end!'};
+expand('<%= a %>', data);
+//=> 'the end!'
+```
+
+### process multiple templates in the same string
+
+```js
+var str = '<%= a %>/<%= b %>';
+expand(str, {a: 'foo', b: 'bar'});
+//=> 'foo/bar'
+```
+
+### process multiple templates in an object value
+
+```js
+var data = {
+  a: {
+    c: '<%= d %>/<%= e %>'
+  },
+  d: 'ddd',
+  e: 'eee'
+};
+expand(data).a.c;
+//=> 'ddd/eee'
+```
+
+### recursively process templates in object values
+
+```js
+var data = {
+  a: '<%= b %>/<%= c %>',
+  b: 'xxx',
+  c: '<%= y %>',
+  y: 'zzz'
+};
+expand('<%= a %>', data);
+//=> 'xxx/zzz'
+```
+
+### call helpers in templates
+
+```js
+var ctx = {
+  foo: 'bar',
+  c: {
+    d: {
+      e: function (str) {
+        return str.toUpperCase();
+      }
+    }
+  }
+};
+expand('abc <%= c.d.e(foo) %> xyz', ctx);
+//=> 'abc BAR xyz'
+```
+
+### use custom regex
+
+Options may be passed as the third argument. Currently `options.regex` is the only option.
+
+```js
+var data = {a: 'bbb', c: 'ddd', e: 'fff'};
+expand({foo: ':c/:e'}, data, {regex: /:([(\w ),]+)/});
+//=> {foo: 'ddd/fff'}
+```
+
+### call functions with custom regex.
+
+```js
+var data = {
+  a: {c: ':d/:e/:upper(f)'},
+  d: 'ddd',
+  e: 'eee',
+  f: 'foo',
+  upper: function (str) {
+    return str.toUpperCase();
+  }
+};
+
+var result = expand(data, data, {regex: /:([(\w ),]+)/});
+console.log(result.a.c);
+//=> 'ddd/eee/FOO'
+```
+
+## Related projects
+
+* [engine](https://www.npmjs.com/package/engine): Template engine based on Lo-Dash template, but adds features like the ability to register helpers… [more](https://www.npmjs.com/package/engine) | [homepage](https://github.com/jonschlinkert/engine)
+* [expand-object](https://www.npmjs.com/package/expand-object): Expand a string into a JavaScript object using a simple notation. Use the CLI or… [more](https://www.npmjs.com/package/expand-object) | [homepage](https://github.com/jonschlinkert/expand-object)
+* [get-value](https://www.npmjs.com/package/get-value): Use property paths (`  a.b.c`) to get a nested value from an object. | [homepage](https://github.com/jonschlinkert/get-value)
+* [glob-object](https://www.npmjs.com/package/glob-object): Filter an object using glob patterns and dot notation. | [homepage](https://github.com/jonschlinkert/glob-object)
+* [set-value](https://www.npmjs.com/package/set-value): Create nested values and any intermediaries using dot notation (`'a.b.c'`) paths. | [homepage](https://github.com/jonschlinkert/set-value)
+
+## Alternatives
+
+Here are some great libs by other authors. My needs for expand differed enough to create a new library, but these are definitely worth a look:
+
+* [expander](https://www.npmjs.com/package/expander): Expand template strings in declarative configurations. | [homepage](https://github.com/tkellen/expander)
+
+## Running tests
+
+Install dev dependencies:
+
+```sh
+$ npm i -d && npm test
+```
+
+## Contributing
+
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/jonschlinkert/expand/issues/new).
+
+## Author
+
+**Jon Schlinkert**
+
++ [github/jonschlinkert](https://github.com/jonschlinkert)
++ [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
+
+## License
+
+Copyright © 2015 Jon Schlinkert
+Released under the MIT license.
+
+***
+
+_This file was generated by [verb-cli](https://github.com/assemble/verb-cli) on August 25, 2015._
