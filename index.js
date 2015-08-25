@@ -1,19 +1,21 @@
 'use strict';
 
-var lazy = require('lazy-cache')(require);
-lazy('is-primitive', 'isPrimitive');
-lazy('kind-of', 'typeOf');
-lazy('get-value', 'get');
-lazy('engine');
+var utils = require('./utils')(require);
 var cache = {prev: null};
 
 /**
  * Resolve templates in the given string, array or object.
  *
+ * ```js
+ * expand({a: '<%= b %>', b: 'FOO'});
+ * //=> {a: 'FOO', b: 'FOO'}
+ * ```
+ *
  * @param {String|Array|Object} `value` The value with templates to resolve.
  * @param {Object} `data`
  * @param {Object} `options`
  * @return {any} Returns a string, object or array.
+ * @api public
  */
 
 function expand(val, data, options) {
@@ -21,11 +23,11 @@ function expand(val, data, options) {
 }
 
 expand.get = function (key, data) {
-  return expand(lazy.get(data, key) || key, data);
+  return expand(utils.get(data, key) || key, data);
 };
 
 function resolve(val, data, options) {
-  switch(lazy.typeOf(val)) {
+  switch(utils.typeOf(val)) {
     case 'string':
       return resolveString(val, data, options);
     case 'object':
@@ -40,7 +42,7 @@ function resolve(val, data, options) {
 
 function resolveString(str, data, options) {
   options = options || {};
-  var regex = options.regex || lazy.engine.utils.delimiters;
+  var regex = options.regex || utils.engine.utils.delimiters;
   var result = str;
 
   str.replace(regex, function (match, es6, erb) {
@@ -54,10 +56,10 @@ function resolveString(str, data, options) {
       var exp = '<%= ' + prop + ' %>';
       val = render(exp, data, options);
     } else {
-      val = lazy.get(data, prop);
+      val = utils.get(data, prop);
     }
 
-    if (lazy.isPrimitive(val)) {
+    if (utils.isPrimitive(val)) {
       if (str.length > match.length) {
         result = str.split(match).join(val);
       } else {
@@ -103,7 +105,7 @@ function resolveObject(obj, data, options) {
  */
 
 function render(str, data, opts) {
-  var engine = lazy.engine();
+  var engine = utils.engine();
   try {
     var val = engine.render(str, data, opts);
     if (val === str) return val;
