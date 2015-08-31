@@ -42,62 +42,73 @@ function resolve(val, data, options) {
 
 function resolveString(str, data, options) {
   options = options || {};
-  var regex = options.regex || utils.engine.utils.delimiters;
+  var regex = utils.createRegex(options);
+
+  if (!regex.test(str)) return str;
   var result = str;
 
-  str.replace(regex, function (match, es6, erb) {
-    var prop = trim(es6 || erb), val;
+  str.replace(regex, function (match, es6, erb, index) {
+    var prop = utils.trim(es6 || erb);
+    var val;
+
+    if (utils.typeOf(erb) === 'number') {
+      index = erb;
+    }
 
     // return if `prop` is an empty string or undefined
-    if (!prop) return match;
+    if (!prop) return;
 
     // if prop is a function, pass to renderer
-    if (/\(.*\)/.test(prop)) {
+    if (/[()]/.test(prop)) {
       var exp = '<%= ' + prop + ' %>';
       val = render(exp, data, options);
     } else {
-      val = utils.get(data, prop);
+      val = data[prop] || utils.get(data, prop);
     }
 
     if (utils.isPrimitive(val)) {
-      if (str.length > match.length) {
-        result = str.split(match).join(val);
+      if (utils.typeOf(index) !== 'number') {
+        index = str.indexOf(match);
+      }
+
+      var len = match.length;
+      if (str.length > len) {
+        var head = str.slice(0, index);
+        var tail = str.slice(index + len);
+        result = head + val + tail;
       } else {
         result = val;
       }
+
     } else if (val) {
       // prevent infinite loops
-      if (result === cache.prev) return match;
+      if (result === cache.prev) return;
 
       cache.prev = result;
       result = resolve(val, data, options);
     }
 
-    if (typeof result === 'string' && regex.test(result)) {
+    if (typeof result === 'string') {
       result = resolveString(result, data, options);
     }
   });
+
   return result;
 }
 
 function resolveArray(arr, data, options) {
   var len = arr.length, i = -1;
-  var res = new Array(len);
-
   while (++i < len) {
-    res[i] = resolve(arr[i], data, options);
+    arr[i] = resolve(arr[i], data, options);
   }
-  return res;
+  return arr;
 }
 
 function resolveObject(obj, data, options) {
-  var res = {};
   for (var key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      res[key] = resolve(obj[key], data, options);
-    }
+    obj[key] = resolve(obj[key], data, options);
   }
-  return res;
+  return obj;
 }
 
 /**
@@ -111,14 +122,8 @@ function render(str, data, opts) {
     if (val === str) return val;
     return render(val, data, opts);
   } catch(err) {
-    // don't throw, just inform the user
-    console.error(err);
-    return;
+    return console.error(err);
   }
-}
-
-function trim(str) {
-  return str == null ? '' : String(str).trim();
 }
 
 /**
