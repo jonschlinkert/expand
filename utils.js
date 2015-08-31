@@ -50,14 +50,13 @@ module.exports = function (fn) {
       return cache[str];
     }
 
-    // var flags = lazy.regexFlags(regex);
-    // if (flags && flags.indexOf('g') > -1) {
-    //   flags = flags.split('').filter(function (flag) {
-    //     return flag !== 'g';
-    //   }).join('');
-    // }
-    // var re = new RegExp(str, flags);
-    var re = new RegExp(str, 'g');
+    var flags = lazy.regexFlags(regex);
+    if (flags && flags.indexOf('g') > -1) {
+      flags = flags.split('').filter(function (flag) {
+        return flag !== 'g';
+      }).join('');
+    }
+    var re = new RegExp(str, flags);
     return (cache[str] = re);
   };
   return lazy;
