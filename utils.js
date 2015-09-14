@@ -20,21 +20,11 @@ lazy('engine');
 lazy.regex = lazy.engine.utils.delimiters;
 
 /**
- * Trim whitespace from a string, or return an
- * empty string if undefined.
- */
-
-lazy.trim = function trim(str) {
-  return str == null ? '' : String(str).trim();
-};
-
-/**
  * Create a valid regex. Strips the `g` flag
- * since we recurse already.
+ * to ensure we have the index we want.
  */
 
 lazy.createRegex = function createRegex(opts) {
-  opts = opts || {};
   var regex = lazy.regex;
   if (lazy.typeOf(opts.regex) === 'regexp') {
     regex = opts.regex;

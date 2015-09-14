@@ -43,6 +43,21 @@ describe('expand', function() {
     assert.deepEqual(expand(two, one).foo, 'd');
   });
 
+  it('should return a function bound to the context.', function () {
+    var ctx = {
+      word: 'foo',
+      addFoo: function (str) {
+        return str + this.word;
+      }
+    };
+
+    var two = {
+      foo: '<%= addFoo %>'
+    };
+
+    assert(expand(two, ctx).foo('bar') === 'barfoo');
+  });
+
   it('should recursively expand templates.', function() {
     var data = {a: '<%= b %>', b: '<%= c %>', c: 'the end!'};
     assert.deepEqual(expand('<%= a %>', data), 'the end!');
@@ -51,6 +66,19 @@ describe('expand', function() {
   it('should process multiple templates in a string.', function() {
     var str = '<%= a %>/<%= b %>';
     assert.deepEqual(expand(str, {a: 'foo', b: 'bar'}), 'foo/bar');
+  });
+
+  it('should process multiple functions in a string.', function() {
+    var str = '<%= a() %>/<%= b() %>';
+    var ctx = {
+      a: function () {
+        return 'aaa';
+      },
+      b: function () {
+        return 'bbb'
+      }
+    };
+    assert.deepEqual(expand(str, ctx), 'aaa/bbb');
   });
 
   it('should process multiple templates in a single property value.', function() {
@@ -101,5 +129,32 @@ describe('expand', function() {
       },
     });
     assert.deepEqual(actual, [{foo: [3, 4, 5, "bar => 1"] }, {f: 6 }, {g: 7 }]);
+  });
+});
+
+describe('options', function () {
+  describe('silent', function  () {
+    it('should throw an error when a function value cannot be resolved.', function() {
+      expand = resolve();
+      var str = '<%= whatever() %>';
+      var ctx = {};
+      var num = 0;
+      try {
+        expand(str, ctx);
+      } catch(err) {
+        num++;
+        assert(err.message === 'whatever is not defined');
+      }
+      assert(num === 1);
+    });
+
+    it('should silence errors when a function value cannot be resolved.', function() {
+      expand = resolve({silent: true});
+      var str = '<%= whatever() %>';
+      var ctx = {};
+
+      var res = expand(str, ctx);
+      assert(res === str);
+    });
   });
 });

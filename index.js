@@ -52,14 +52,19 @@ function expand(options) {
       if (typeof val === 'object') {
         val = resolve(val, data, options);
 
+      // ensure we have a string. numbers are the most
+      // likely thing to blow this up at this point
       } else if (typeof val !== 'function') {
-        val = String(val);
+        val = val.toString();
       }
 
       if (typeof val === 'function') {
         return val.bind(data);
       }
 
+      // could be an array, object, etc. if so, just
+      // break and return the value. we could add one
+      // more `resolve` here if there is a reason to
       if (typeof val !== 'string') {
         str = val;
         break;
@@ -101,13 +106,14 @@ function expand(options) {
 
     try {
       var val = engine.render(str, data, options);
-      if (val === str) return val;
       return render(val, data, options);
     } catch(err) {
-      return console.error(err);
+      if (options.silent === true) {
+        return str;
+      }
+      throw err;
     }
   }
-
   return resolve;
 }
 
