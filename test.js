@@ -2,6 +2,7 @@
 
 /* deps: mocha */
 var util = require('util');
+var get = require('get-value');
 var assert = require('assert');
 var expand = require('./');
 
@@ -21,6 +22,10 @@ describe('expand', function() {
 
   it('should process a template in an array.', function() {
     assert.deepEqual(expand(['<%= a %>'], {a: 'b'}), ['b']);
+  });
+
+  it('should return unprocessed templates.', function() {
+    assert.deepEqual(expand(['<%= a %>'], {}), ['<%= a %>']);
   });
 
   it('should process multiple templates in an array.', function() {

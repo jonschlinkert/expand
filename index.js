@@ -1,6 +1,6 @@
 'use strict';
 
-var utils = require('./utils')(require);
+var utils = require('./utils');
 var cache = {prev: null};
 
 /**
@@ -56,7 +56,7 @@ function resolveString(str, data, options) {
     }
 
     // return if `prop` is an empty string or undefined
-    if (!prop) return;
+    if (!prop) return match;
 
     // if prop is a function, pass to renderer
     if (/[()]/.test(prop)) {
@@ -82,7 +82,7 @@ function resolveString(str, data, options) {
 
     } else if (val) {
       // prevent infinite loops
-      if (result === cache.prev) return;
+      if (result === cache.prev) return match;
 
       cache.prev = result;
       result = resolve(val, data, options);
@@ -91,6 +91,8 @@ function resolveString(str, data, options) {
     if (typeof result === 'string') {
       result = resolveString(result, data, options);
     }
+
+    result = result || match;
   });
 
   return result;
