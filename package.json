@@ -1,7 +1,7 @@
 {
   "name": "expand",
   "description": "Recursively resolve templates in an object, string or array.",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "homepage": "https://github.com/jonschlinkert/expand",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "repository": "jonschlinkert/expand",
@@ -21,8 +21,8 @@
     "test": "mocha"
   },
   "dependencies": {
-    "engine": "^0.1.6",
-    "get-value": "^1.1.5",
+    "engine": "^0.1.8",
+    "get-value": "^1.2.1",
     "is-primitive": "^2.0.0",
     "kind-of": "^2.0.1",
     "lazy-cache": "^0.2.3",
