@@ -1,135 +1,119 @@
 'use strict';
 
+var get = require('get-value');
 var utils = require('./utils');
-var cache = {prev: null};
 
-/**
- * Resolve templates in the given string, array or object.
- *
- * ```js
- * expand({a: '<%= b %>', b: 'FOO'});
- * //=> {a: 'FOO', b: 'FOO'}
- * ```
- *
- * @param {String|Array|Object} `value` The value with templates to resolve.
- * @param {Object} `data`
- * @param {Object} `options`
- * @return {any} Returns a string, object or array.
- * @api public
- */
-
-function expand(val, data, options) {
-  return resolve(val, data || val, options);
-}
-
-expand.get = function (key, data) {
-  return expand(utils.get(data, key) || key, data);
-};
-
-function resolve(val, data, options) {
-  switch(utils.typeOf(val)) {
-    case 'string':
-      return resolveString(val, data, options);
-    case 'object':
-      return resolveObject(val, data, options);
-    case 'array':
-      return resolveArray(val, data, options);
-    default: {
-      return val;
-    }
-  }
-}
-
-function resolveString(str, data, options) {
+function expand(options) {
   options = options || {};
   var regex = utils.createRegex(options);
 
-  if (!regex.test(str)) return str;
-  var result = str;
+  function resolve(val, data) {
+    data = data || val;
 
-  str.replace(regex, function (match, es6, erb, index) {
-    var prop = utils.trim(es6 || erb);
-    var val;
-
-    if (utils.typeOf(erb) === 'number') {
-      index = erb;
-    }
-
-    // return if `prop` is an empty string or undefined
-    if (!prop) return match;
-
-    // if prop is a function, pass to renderer
-    if (/[()]/.test(prop)) {
-      var exp = '<%= ' + prop + ' %>';
-      val = render(exp, data, options);
-    } else {
-      val = data[prop] || utils.get(data, prop);
-    }
-
-    if (utils.isPrimitive(val)) {
-      if (utils.typeOf(index) !== 'number') {
-        index = str.indexOf(match);
+    switch(utils.typeOf(val)) {
+      case 'string':
+        return resolveString(val, data, options);
+      case 'object':
+        return resolveObject(val, data, options);
+      case 'array':
+        return resolveArray(val, data, options);
+      default: {
+        return val;
       }
+    }
+  }
 
+  function resolveString(str, data) {
+    var m;
+
+    while (m = regex.exec(str)) {
+      var orig = str;
+      var prop = (m[1] || m[2] || '').trim();
+      var match = m[0];
+
+      if (!match) return str;
       var len = match.length;
-      if (str.length > len) {
-        var head = str.slice(0, index);
-        var tail = str.slice(index + len);
-        result = head + val + tail;
+      var i = m.index;
+
+      var val = match;
+      if (/[()]/.test(prop)) {
+        prop = '<%= ' + prop + ' %>';
+        val = render(prop, data, options);
       } else {
-        result = val;
+        val = get(data, prop);
       }
 
-    } else if (val) {
-      // prevent infinite loops
-      if (result === cache.prev) return match;
+      // if no value was retured from `get` or `render`,
+      // reset the value to `match`
+      val = val || match;
 
-      cache.prev = result;
-      result = resolve(val, data, options);
+      // if the value is an object, recurse to resolve
+      // templates in the keys and values of the object
+      if (typeof val === 'object') {
+        val = resolve(val, data, options);
+
+      } else if (typeof val !== 'function') {
+        val = String(val);
+      }
+
+      if (typeof val === 'function') {
+        return val.bind(data);
+      }
+
+      if (typeof val !== 'string') {
+        str = val;
+        break;
+      }
+
+      var head = str.slice(0, i);
+      var tail = str.slice(i + len);
+
+      str = head + val + tail;
+      if (str === orig) break;
+    }
+    return str;
+  }
+
+  function resolveArray(arr, data) {
+    var len = arr.length, i = -1;
+    while (++i < len) {
+      arr[i] = resolve(arr[i], data);
+    }
+    return arr;
+  }
+
+  function resolveObject(obj, data) {
+    for (var key in obj) {
+      obj[key] = resolve(obj[key], data);
+    }
+    return obj;
+  }
+
+  function render(str, data, options) {
+    // we re-create the delims as native erb-like delims,
+    // so we don't want the custom regex passed to the engine
+    delete options.regex;
+
+    var engine = utils.engine(options);
+    if (!utils.regex.test(str)) {
+      return data[str] || str;
     }
 
-    if (typeof result === 'string') {
-      result = resolveString(result, data, options);
+    try {
+      var val = engine.render(str, data, options);
+      if (val === str) return val;
+      return render(val, data, options);
+    } catch(err) {
+      return console.error(err);
     }
-
-    result = result || match;
-  });
-
-  return result;
-}
-
-function resolveArray(arr, data, options) {
-  var len = arr.length, i = -1;
-  while (++i < len) {
-    arr[i] = resolve(arr[i], data, options);
   }
-  return arr;
-}
 
-function resolveObject(obj, data, options) {
-  for (var key in obj) {
-    obj[key] = resolve(obj[key], data, options);
-  }
-  return obj;
-}
-
-/**
- * Render templates in a `string` with the given `data`.
- */
-
-function render(str, data, opts) {
-  var engine = utils.engine();
-  try {
-    var val = engine.render(str, data, opts);
-    if (val === str) return val;
-    return render(val, data, opts);
-  } catch(err) {
-    return console.error(err);
-  }
+  return resolve;
 }
 
 /**
  * Expose `expand`
+ * @type {Function}
  */
 
 module.exports = expand;

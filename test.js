@@ -4,13 +4,18 @@
 var util = require('util');
 var get = require('get-value');
 var assert = require('assert');
-var expand = require('./');
+var resolve = require('./');
+var expand;
 
 var inspect = function (obj) {
   return util.inspect(obj, null, 10);
 };
 
 describe('expand', function() {
+  beforeEach(function () {
+    expand = resolve();
+  });
+
   it('should expand values in a string.', function() {
     assert.strictEqual(expand('<%= a %>', {a: 'b'}), 'b');
   });
@@ -67,10 +72,12 @@ describe('expand', function() {
 
   it('should use custom regex.', function() {
     var one = {a: {c: ':d/:e'}, d: 'ddd', e: 'eee'};
-    assert.deepEqual(expand(one, one, {regex: /:([(\w ),]+)/}).a.c, 'ddd/eee');
+    expand = resolve({regex: /:([(\w ),]+)/});
+    assert.deepEqual(expand(one).a.c, 'ddd/eee');
   });
 
   it('should call functions with custom regex.', function () {
+    expand = resolve({regex: /:([(\w ),]+)/ });
     var one = {
       a: {c: ':d/:e/:upper(f)'},
       d: 'ddd',
@@ -80,9 +87,7 @@ describe('expand', function() {
         return str.toUpperCase();
       }
     };
-    var actual = expand(one, one, {
-      regex: /:([(\w ),]+)/
-    });
+    var actual = expand(one);
     assert.deepEqual(actual.a.c, 'ddd/eee/FOO');
   });
 
