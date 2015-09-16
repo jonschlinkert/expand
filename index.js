@@ -45,7 +45,9 @@ function expand(options) {
 
       // if no value was retured from `get` or `render`,
       // reset the value to `match`
-      val = val || match;
+      if (typeof val == 'undefined') {
+        val = match;
+      }
 
       // if the value is an object, recurse to resolve
       // templates in the keys and values of the object
