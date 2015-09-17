@@ -23,6 +23,9 @@ describe('expand', function() {
   it('should work with dot notation.', function() {
     assert.strictEqual(expand('<%= a.b %>', {a: {b: 'c'}}), 'c');
     assert.strictEqual(expand('<%= a.html %>', {a: 'b'}), 'b.html');
+    assert.strictEqual(expand('<%= a.min.js %>', {a: 'b'}), 'b.min.js');
+    assert(expand('<%= a.b.c.html %>', {a: {b: {c: 'd'}}}) === 'd.html');
+    assert(expand('<%= a.b.c.min.js %>', {a: {b: {c: 'd'}}}) === 'd.min.js');
   });
 
   it('should return `match` if dot notation values are not all strings.', function() {
@@ -109,8 +112,9 @@ describe('expand', function() {
 
   it('should use custom regex.', function() {
     var one = {a: {c: ':d/:e'}, d: 'ddd', e: 'eee'};
-    expand = resolve({regex: /:([(\w ),]+)/});
-    assert.deepEqual(expand(one).a.c, 'ddd/eee');
+    expand = resolve({regex: /:([(\w ),.]+)/});
+    assert(expand(one).a.c === 'ddd/eee');
+    assert(expand('foo/:a.b.c.html', {a: {b: {c: 'd'}}}) === 'foo/d.html');
   });
 
   it('should call functions with custom regex.', function () {

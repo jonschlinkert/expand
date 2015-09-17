@@ -86,11 +86,19 @@ function expand(options) {
 
     var idx = prop.indexOf('.');
     if (typeof val === 'undefined' && idx > -1) {
-      val = get(data, prop.slice(0, idx));
+      var segs = prop.split('.');
+      var last = '.' + segs.pop();
+
+      val = get(data, segs.join('.'));
       if (typeof val !== 'string') {
-        return;
+        last = '.' + segs.pop() + last;
+        val = get(data, segs.join('.'));
+
+        if (typeof val !== 'string') {
+          return;
+        }
       }
-      val = val + prop.slice(idx);
+      val = val + last;
     }
     return val;
   }
