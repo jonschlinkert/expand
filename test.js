@@ -20,6 +20,15 @@ describe('expand', function() {
     assert.strictEqual(expand('<%= a %>', {a: 'b'}), 'b');
   });
 
+  it('should work with dot notation.', function() {
+    assert.strictEqual(expand('<%= a.b %>', {a: {b: 'c'}}), 'c');
+    assert.strictEqual(expand('<%= a.html %>', {a: 'b'}), 'b.html');
+  });
+
+  it('should return `match` if dot notation values are not all strings.', function() {
+    assert.strictEqual(expand('<%= a.html %>', {a: {b: 'c'}}), '<%= a.html %>');
+  });
+
   it('should process templates in an object value.', function() {
     var one = {a: {c: '<%= d %>'}, d: {f: 'g'}};
     assert.deepEqual(expand(one).a.c, {f: 'g'});

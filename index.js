@@ -40,12 +40,12 @@ function expand(options) {
         prop = '<%= ' + prop + ' %>';
         val = render(prop, data, options);
       } else {
-        val = get(data, prop);
+        val = resolveProperty(prop, data);
       }
 
       // if no value was retured from `get` or `render`,
       // reset the value to `match`
-      if (typeof val == 'undefined') {
+      if (typeof val === 'undefined') {
         val = match;
       }
 
@@ -79,6 +79,20 @@ function expand(options) {
       if (str === orig) break;
     }
     return str;
+  }
+
+  function resolveProperty(prop, data) {
+    var val = get(data, prop);
+
+    var idx = prop.indexOf('.');
+    if (typeof val === 'undefined' && idx > -1) {
+      val = get(data, prop.slice(0, idx));
+      if (typeof val !== 'string') {
+        return;
+      }
+      val = val + prop.slice(idx);
+    }
+    return val;
   }
 
   function resolveArray(arr, data) {
