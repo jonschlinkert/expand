@@ -1,6 +1,5 @@
 'use strict';
 
-var get = require('get-value');
 var utils = require('./utils');
 
 function expand(options) {
@@ -82,25 +81,33 @@ function expand(options) {
   }
 
   function resolveProperty(prop, data) {
-    var val = get(data, prop);
+    var dot = prop.slice(-1) === '.';
+    if (dot) prop = prop.slice(0, -1);
 
+    var val = utils.get(data, prop);
+    if (dot) val += '.';
+    if (val) return val;
+
+    // if no `.`, return
     var idx = prop.indexOf('.');
-    if (typeof val === 'undefined' && idx > -1) {
-      var segs = prop.split('.');
-      var last = '.' + segs.pop();
+    if (idx === -1) return;
 
-      val = get(data, segs.join('.'));
+    // `.` might mean it's a file extension
+    // so try popping off the extension and
+    // try again
+    var segs = prop.split('.');
+    var last = '.' + segs.pop();
+
+    val = utils.get(data, segs.join('.'));
+    if (typeof val !== 'string') {
+      last = '.' + segs.pop() + last;
+      val = utils.get(data, segs.join('.'));
+
       if (typeof val !== 'string') {
-        last = '.' + segs.pop() + last;
-        val = get(data, segs.join('.'));
-
-        if (typeof val !== 'string') {
-          return;
-        }
+        return;
       }
-      val = val + last;
     }
-    return val;
+    return val + last;
   }
 
   function resolveArray(arr, data) {

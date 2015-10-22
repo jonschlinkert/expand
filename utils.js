@@ -3,30 +3,56 @@
 var cache = {};
 
 /**
- * Expose lazily required module dependecies as `lazy` methods
+ * Module dependencies
  */
 
-var lazy = require('lazy-cache')(require);
-lazy('is-primitive', 'isPrimitive');
-lazy('kind-of', 'typeOf');
-lazy('get-value', 'get');
-lazy('regex-flags');
-lazy('engine');
+var utils = require('lazy-cache')(require);
+
+/**
+ * Temporarily re-assign `require` to trick browserify and
+ * webpack into reconizing lazy dependencies.
+ *
+ * This tiny bit of ugliness has the huge dual advantage of
+ * only loading modules that are actually called at some
+ * point in the lifecycle of the application, whilst also
+ * allowing browserify and webpack to find modules that
+ * are depended on but never actually called.
+ */
+
+var fn = require;
+require = utils;
+
+/**
+ * Lazily required module dependencies
+ */
+
+require('get-value');
+require('is-primitive', 'isPrimitive');
+require('kind-of', 'typeOf');
+require('get-value', 'get');
+require('regex-flags');
+require('engine');
+
+/**
+ * Restore `require`
+ */
+
+require = fn;
 
 /**
  * Get the regex from `engine/utils`
  */
 
-lazy.regex = lazy.engine.utils.delimiters;
+utils.regex = utils.engine.utils.delimiters;
 
 /**
  * Create a valid regex. Strips the `g` flag
  * to ensure we have the index we want.
  */
 
-lazy.createRegex = function createRegex(opts) {
-  var regex = lazy.regex;
-  if (lazy.typeOf(opts.regex) === 'regexp') {
+utils.createRegex = function createRegex(opts) {
+  var regex = utils.regex;
+  if (utils.typeOf(opts.regex) === 'regexp') {
     regex = opts.regex;
   }
 
@@ -35,7 +61,7 @@ lazy.createRegex = function createRegex(opts) {
     return cache[str];
   }
 
-  var flags = lazy.regexFlags(regex);
+  var flags = utils.regexFlags(regex);
   if (flags && flags.indexOf('g') > -1) {
     flags = flags.split('').filter(function (flag) {
       return flag !== 'g';
@@ -46,7 +72,7 @@ lazy.createRegex = function createRegex(opts) {
 };
 
 /**
- * Expose utils
+ * Expose `utils` modules
  */
 
-module.exports = lazy;
+module.exports = utils;

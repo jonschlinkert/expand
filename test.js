@@ -4,6 +4,8 @@
 var util = require('util');
 var get = require('get-value');
 var assert = require('assert');
+var parse = require('parse-filepath');
+var extend = require('extend-shallow');
 var resolve = require('./');
 var expand;
 
@@ -115,6 +117,14 @@ describe('expand', function() {
     expand = resolve({regex: /:([(\w ),.]+)/});
     assert(expand(one).a.c === 'ddd/eee');
     assert(expand('foo/:a.b.c.html', {a: {b: {c: 'd'}}}) === 'foo/d.html');
+  });
+
+  it('should use custom regex with a file extension in the pattern', function() {
+    var data = {dir: 'dist', a: 'A', b: 'B', c: 'C'};
+    data = extend({}, data, parse('dist/index.hbs'));
+    expand = resolve({regex: /:([(\w ),.]+)/});
+    var res = expand(':dir/:name.:a:b:c', data);
+    assert.equal(res, 'dist/index.ABC');
   });
 
   it('should call functions with custom regex.', function () {
