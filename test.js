@@ -119,6 +119,83 @@ describe('expand', function() {
     assert(expand('foo/:a.b.c.html', {a: {b: {c: 'd'}}}) === 'foo/d.html');
   });
 
+  it('should work with native javascript methods', function() {
+    var fixture = {
+      deps: {a: '', b: '', c: ''}, foo: '<%= Object.keys(deps) %>'
+    };
+
+    expand = resolve();
+    assert.deepEqual(expand(fixture), {
+      deps: { a: '', b: '', c: '' },
+      foo: [ 'a', 'b', 'c' ]
+    });
+
+    fixture.deps.a = 'aaa';
+    fixture.bar = '<%= (deps.a).toUpperCase() %>';
+
+    assert.deepEqual(expand(fixture), {
+      deps: { a: 'aaa', b: '', c: '' },
+      foo: [ 'a', 'b', 'c' ],
+      bar: 'AAA'
+    });
+
+    fixture.baz = '<%= bar.split("") %>';
+    assert.deepEqual(expand(fixture), {
+      deps: { a: 'aaa', b: '', c: '' },
+      foo: [ 'a', 'b', 'c' ],
+      bar: 'AAA',
+      baz: ['A', 'A', 'A']
+    });
+
+    fixture.fez = 'a <%= bar.split("") %> b';
+    assert.deepEqual(expand(fixture), {
+      deps: { a: 'aaa', b: '', c: '' },
+      foo: [ 'a', 'b', 'c' ],
+      bar: 'AAA',
+      baz: ['A', 'A', 'A'],
+      fez: 'a A,A,A b'
+    });
+
+    fixture.qux = '<%= bar.split("").join("-") %>';
+    assert.deepEqual(expand(fixture), {
+      deps: { a: 'aaa', b: '', c: '' },
+      foo: [ 'a', 'b', 'c' ],
+      bar: 'AAA',
+      baz: ['A', 'A', 'A'],
+      fez: 'a A,A,A b',
+      qux: 'A-A-A',
+    });
+  });
+
+  it('should work with complex expressions', function() {
+    var fixture = {
+      deps: {a: '', b: '', c: ''}, foo: '<%= Object.keys(deps).map(function(str) {return str.toUpperCase()}) %>'
+    };
+
+    expand = resolve();
+    assert.deepEqual(expand(fixture), {
+      deps: { a: '', b: '', c: '' },
+      foo: [ 'A', 'B', 'C' ]
+    });
+  });
+
+  it('should work with nested expressions and helpers', function() {
+    var fixture = {
+      upper: function(keys) {
+        return keys.map(function(key) {
+          return key.toUpperCase();
+        });
+      },
+      deps: {a: '', b: '', c: ''}, foo: '<%= upper(Object.keys(deps)) %>'
+    };
+    expand = resolve();
+    assert.deepEqual(expand(fixture), {
+      deps: { a: '', b: '', c: '' },
+      foo: [ 'A', 'B', 'C' ],
+      upper: fixture.upper
+    });
+  });
+
   it('should use custom regex with a file extension in the pattern', function() {
     var data = {dir: 'dist', a: 'A', b: 'B', c: 'C'};
     data = extend({}, data, parse('dist/index.hbs'));
