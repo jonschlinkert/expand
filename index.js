@@ -21,6 +21,22 @@ function expand(options) {
       }
     }
   }
+  function values(data, keys) {
+    var len = keys.length;
+    var vals = new Array(len);
+    while (len--) {
+      vals[len] = data[keys[len]];
+    }
+    return vals;
+  }
+
+  function interpolate(str) {
+    return function(data) {
+      var keys = Object.keys(data);
+      var vals = values(data, keys);
+      return Function(keys, 'return ' + str).apply(null, vals);
+    };
+  }
 
   function resolveString(str, data) {
     var m;
@@ -32,18 +48,22 @@ function expand(options) {
 
       if (!match) return str;
       var len = match.length;
+      var val = match;
       var i = m.index;
 
-      var val = match;
       if (/[()]/.test(prop)) {
-        prop = '<%= ' + prop + ' %>';
-        val = render(prop, data, options);
+        try {
+          val = interpolate(prop)(data);
+        } catch (err) {
+          prop = '<%= ' + prop + ' %>';
+          val = render(prop, data, options);
+        }
       } else {
         val = resolveProperty(prop, data);
       }
 
       // if no value was retured from `get` or `render`,
-      // reset the value to `match`
+      // reset the value back to `match`
       if (typeof val === 'undefined') {
         val = match;
       }
@@ -63,18 +83,19 @@ function expand(options) {
         return val.bind(data);
       }
 
+      var head = str.slice(0, i) || '';
+      var tail = str.slice(i + len) || '';
+
       // could be an array, object, etc. if so, just
       // break and return the value. we could add one
       // more `resolve` here if there is a reason to
-      if (typeof val !== 'string') {
+      if (typeof val !== 'string' && !head && !tail) {
         str = val;
         break;
+      } else {
+        str = head + val + tail;
       }
 
-      var head = str.slice(0, i);
-      var tail = str.slice(i + len);
-
-      str = head + val + tail;
       if (str === orig) break;
     }
     return str;
