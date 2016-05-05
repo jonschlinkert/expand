@@ -1,3 +1,4 @@
+
 'use strict';
 
 var utils = require('./utils');
@@ -40,9 +41,10 @@ function expand(options) {
 
   function resolveString(str, data) {
     var m;
+    var s = '';
+    var orig = str;
 
     while (m = regex.exec(str)) {
-      var orig = str;
       var prop = (m[1] || m[2] || '').trim();
       var match = m[0];
 
@@ -90,15 +92,17 @@ function expand(options) {
       // break and return the value. we could add one
       // more `resolve` here if there is a reason to
       if (typeof val !== 'string' && !head && !tail) {
-        str = val;
+        s = val;
         break;
       } else {
-        str = head + val + tail;
+        str = tail;
+        s += head + val;
       }
 
-      if (str === orig) break;
+      if (s === orig && !tail) break;
     }
-    return str;
+    s += str;
+    return s;
   }
 
   function resolveProperty(prop, data) {
