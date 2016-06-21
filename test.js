@@ -219,6 +219,10 @@ describe('expand', function() {
     assert.deepEqual(actual.a.c, 'ddd/eee/FOO');
   });
 
+  it('should process boolean in data.', function() {
+    assert.strictEqual(expand('<%= a %> <%= b %>', {a: false, b: true}), 'false true');
+  });
+
   it('should process nested templates recursively', function() {
     var actual = expand('<%= c.e %>', {
       a: 1,
