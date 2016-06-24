@@ -5,9 +5,9 @@ var fixture = {
   deps: {
     a: '',
     b: '',
-    c: '',
+    c: ''
   },
   foo: '<%= Object.keys(deps) %>'
 };
 
-expand()(fixture)
+expand()(fixture);

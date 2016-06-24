@@ -9,7 +9,7 @@ function expand(options) {
   function resolve(val, data) {
     data = data || val;
 
-    switch(utils.typeOf(val)) {
+    switch (utils.typeOf(val)) {
       case 'string':
         return resolveString(val, data, options);
       case 'object':
@@ -41,7 +41,7 @@ function expand(options) {
   function resolveString(str, data) {
     var m;
 
-    while (m = regex.exec(str)) {
+    while ((m = regex.exec(str))) {
       var orig = str;
       var prop = (m[1] || m[2] || '').trim();
       var match = m[0];
@@ -150,8 +150,8 @@ function expand(options) {
   }
 
   function render(str, data, options) {
-    // we re-create the delims as native erb-like delims,
-    // so we don't want the custom regex passed to the engine
+    // we re-create the delims as native erb-like delims, and we
+    // don't want avoid passing the custom regex to the engine
     delete options.regex;
 
     var engine = utils.engine(options);
@@ -162,7 +162,7 @@ function expand(options) {
     try {
       var val = engine.render(str, data, options);
       return render(val, data, options);
-    } catch(err) {
+    } catch (err) {
       if (options.silent === true) {
         return str;
       }

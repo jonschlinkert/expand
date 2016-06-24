@@ -1,20 +1,13 @@
 'use strict';
 
-/* deps: mocha */
-var util = require('util');
-var get = require('get-value');
 var assert = require('assert');
 var parse = require('parse-filepath');
 var extend = require('extend-shallow');
 var resolve = require('./');
 var expand;
 
-var inspect = function (obj) {
-  return util.inspect(obj, null, 10);
-};
-
 describe('expand', function() {
-  beforeEach(function () {
+  beforeEach(function() {
     expand = resolve();
   });
 
@@ -26,8 +19,8 @@ describe('expand', function() {
     assert.strictEqual(expand('<%= a.b %>', {a: {b: 'c'}}), 'c');
     assert.strictEqual(expand('<%= a.html %>', {a: 'b'}), 'b.html');
     assert.strictEqual(expand('<%= a.min.js %>', {a: 'b'}), 'b.min.js');
-    assert(expand('<%= a.b.c.html %>', {a: {b: {c: 'd'}}}) === 'd.html');
-    assert(expand('<%= a.b.c.min.js %>', {a: {b: {c: 'd'}}}) === 'd.min.js');
+    assert.equal(expand('<%= a.b.c.html %>', {a: {b: {c: 'd'}}}), 'd.html');
+    assert.equal(expand('<%= a.b.c.min.js %>', {a: {b: {c: 'd'}}}), 'd.min.js');
   });
 
   it('should return `match` if dot notation values are not all strings.', function() {
@@ -57,10 +50,10 @@ describe('expand', function() {
     assert.deepEqual(expand(two, one).foo, 'd');
   });
 
-  it('should return a function bound to the context.', function () {
+  it('should return a function bound to the context.', function() {
     var ctx = {
       word: 'foo',
-      addFoo: function (str) {
+      addFoo: function(str) {
         return str + this.word;
       }
     };
@@ -69,7 +62,7 @@ describe('expand', function() {
       foo: '<%= addFoo %>'
     };
 
-    assert(expand(two, ctx).foo('bar') === 'barfoo');
+    assert.equal(expand(two, ctx).foo('bar'), 'barfoo');
   });
 
   it('should recursively expand templates.', function() {
@@ -85,11 +78,11 @@ describe('expand', function() {
   it('should process multiple functions in a string.', function() {
     var str = '<%= a() %>/<%= b() %>';
     var ctx = {
-      a: function () {
+      a: function() {
         return 'aaa';
       },
-      b: function () {
-        return 'bbb'
+      b: function() {
+        return 'bbb';
       }
     };
     assert.deepEqual(expand(str, ctx), 'aaa/bbb');
@@ -106,7 +99,7 @@ describe('expand', function() {
   });
 
   it('should call helpers in templates:', function() {
-    var ctx = {foo: 'bar', c: {d: {e: function (str) {
+    var ctx = {foo: 'bar', c: {d: {e: function(str) {
       return str.toUpperCase();
     }}}};
     assert.deepEqual(expand('abc <%= c.d.e(foo) %> xyz', ctx), 'abc BAR xyz');
@@ -115,8 +108,8 @@ describe('expand', function() {
   it('should use custom regex.', function() {
     var one = {a: {c: ':d/:e'}, d: 'ddd', e: 'eee'};
     expand = resolve({regex: /:([(\w ),.]+)/});
-    assert(expand(one).a.c === 'ddd/eee');
-    assert(expand('foo/:a.b.c.html', {a: {b: {c: 'd'}}}) === 'foo/d.html');
+    assert.equal(expand(one).a.c, 'ddd/eee');
+    assert.equal(expand('foo/:a.b.c.html', {a: {b: {c: 'd'}}}), 'foo/d.html');
   });
 
   it('should work with native javascript methods', function() {
@@ -163,7 +156,7 @@ describe('expand', function() {
       bar: 'AAA',
       baz: ['A', 'A', 'A'],
       fez: 'a A,A,A b',
-      qux: 'A-A-A',
+      qux: 'A-A-A'
     });
   });
 
@@ -204,14 +197,14 @@ describe('expand', function() {
     assert.equal(res, 'dist/index.ABC');
   });
 
-  it('should call functions with custom regex.', function () {
+  it('should call functions with custom regex.', function() {
     expand = resolve({regex: /:([(\w ),]+)/ });
     var one = {
       a: {c: ':d/:e/:upper(f)'},
       d: 'ddd',
       e: 'eee',
       f: 'foo',
-      upper: function (str) {
+      upper: function(str) {
         return str.toUpperCase();
       }
     };
@@ -226,9 +219,9 @@ describe('expand', function() {
       c: {
         d: [3, 4, 5, 'bar => <%= a %>'],
         e: [{foo: '<%= c.d %>'}, {f: 6 }, {g: 7 }]
-      },
+      }
     });
-    assert.deepEqual(actual, [{foo: [3, 4, 5, "bar => 1"] }, {f: 6 }, {g: 7 }]);
+    assert.deepEqual(actual, [{foo: [3, 4, 5, 'bar => 1'] }, {f: 6 }, {g: 7 }]);
   });
 
   it('should process other template on first failure.', function() {
@@ -236,8 +229,8 @@ describe('expand', function() {
   });
 });
 
-describe('options', function () {
-  describe('silent', function  () {
+describe('options', function() {
+  describe('silent', function() {
     it('should throw an error when a function value cannot be resolved.', function() {
       expand = resolve();
       var str = '<%= whatever() %>';
@@ -245,11 +238,11 @@ describe('options', function () {
       var num = 0;
       try {
         expand(str, ctx);
-      } catch(err) {
+      } catch (err) {
         num++;
-        assert(err.message === 'whatever is not defined');
+        assert.equal(err.message, 'whatever is not defined');
       }
-      assert(num === 1);
+      assert.equal(num, 1);
     });
 
     it('should silence errors when a function value cannot be resolved.', function() {
@@ -258,7 +251,7 @@ describe('options', function () {
       var ctx = {};
 
       var res = expand(str, ctx);
-      assert(res === str);
+      assert.equal(res, str);
     });
   });
 });

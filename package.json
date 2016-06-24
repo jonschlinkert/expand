@@ -21,23 +21,22 @@
     "test": "mocha"
   },
   "dependencies": {
-    "engine": "^0.1.8",
-    "get-value": "^2.0.2",
+    "engine": "^0.1.11",
+    "get-value": "^2.0.6",
     "is-primitive": "^2.0.0",
-    "kind-of": "^3.0.2",
-    "lazy-cache": "^1.0.2",
+    "kind-of": "^3.0.3",
+    "lazy-cache": "^2.0.1",
     "regex-flags": "^0.1.0"
   },
   "devDependencies": {
     "extend-shallow": "^2.0.1",
-    "gulp": "^3.9.0",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^2.0.0",
     "gulp-format-md": "^0.1.9",
-    "gulp-istanbul": "^0.10.0",
-    "gulp-jshint": "^1.11.2",
-    "gulp-mocha": "^2.1.3",
-    "jshint-stylish": "^2.0.1",
-    "mocha": "*",
-    "parse-filepath": "^0.6.3"
+    "gulp-istanbul": "^1.0.0",
+    "gulp-mocha": "^2.2.0",
+    "mocha": "^2.5.3",
+    "parse-filepath": "^1.0.1"
   },
   "keywords": [
     "config",
@@ -65,8 +64,8 @@
       ]
     },
     "reflinks": [
-      "verb-readme-generator",
-      "verb"
+      "verb",
+      "verb-readme-generator"
     ],
     "toc": false,
     "layout": "default",
