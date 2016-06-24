@@ -1,4 +1,16 @@
-# expand [![NPM version](https://img.shields.io/npm/v/expand.svg)](https://www.npmjs.com/package/expand) [![Build Status](https://img.shields.io/travis/jonschlinkert/expand.svg)](https://travis-ci.org/jonschlinkert/expand)
+# expand [![NPM version](https://img.shields.io/npm/v/expand.svg?style=flat)](https://www.npmjs.com/package/expand) [![NPM downloads](https://img.shields.io/npm/dm/expand.svg?style=flat)](https://npmjs.org/package/expand) [![Build Status](https://img.shields.io/travis/jonschlinkert/expand.svg?style=flat)](https://travis-ci.org/jonschlinkert/expand)
+
+Recursively resolve templates in an object, string or array.
+
+## Install
+
+Install with [npm](https://www.npmjs.com/):
+
+```sh
+$ npm install --save expand
+```
+
+# expand [![NPM version](https://img.shields.io/npm/v/expand.svg?style=flat)](https://www.npmjs.com/package/expand) [![Build Status](https://img.shields.io/travis/jonschlinkert/expand.svg?style=flat)](https://travis-ci.org/jonschlinkert/expand)
 
 > Recursively resolve templates in an object, string or array.
 
@@ -16,12 +28,12 @@ resolve(':a/:b', {a: 'foo', b: 'bar'});
 //=> 'foo/bar'
 ```
 
-
 ## Install
-Install with [npm](https://www.npmjs.com/)
+
+Install with [npm](https://www.npmjs.com/):
 
 ```sh
-$ npm i expand --save
+$ npm install --save expand
 ```
 
 ## Usage
@@ -43,7 +55,7 @@ expand(valueToExpand, dataToUse, options);
 
 * `value` **{String|Array|Object}**: The value with templates to resolve.
 * `data` **{Object}**: Pass the data to use for resolving templates. If the first argument is an object, this is optional.
-* `options` **{Object}**: Pass the regex to use for matching templates. 
+* `options` **{Object}**: Pass the regex to use for matching templates.
 * `returns` **{any}**: Returns a string, object or array based on what was passed.
 
 **Example**
@@ -182,38 +194,95 @@ console.log(result.a.c);
 ```
 
 ## Related projects
-* [engine](https://www.npmjs.com/package/engine): Template engine based on Lo-Dash template, but adds features like the ability to register helpers… [more](https://www.npmjs.com/package/engine) | [homepage](https://github.com/jonschlinkert/engine)
-* [expand-object](https://www.npmjs.com/package/expand-object): Expand a string into a JavaScript object using a simple notation. Use the CLI or… [more](https://www.npmjs.com/package/expand-object) | [homepage](https://github.com/jonschlinkert/expand-object)
-* [get-value](https://www.npmjs.com/package/get-value): Use property paths (`a.b.c`) to get a nested value from an object. | [homepage](https://github.com/jonschlinkert/get-value)
-* [glob-object](https://www.npmjs.com/package/glob-object): Filter an object using glob patterns and dot notation. | [homepage](https://github.com/jonschlinkert/glob-object)
-* [set-value](https://www.npmjs.com/package/set-value): Create nested values and any intermediaries using dot notation (`'a.b.c'`) paths. | [homepage](https://github.com/jonschlinkert/set-value)  
+
+* [glob-object](https://www.npmjs.com/package/glob-object): Filter an object using glob patterns and dot notation. | [homepage](https://github.com/jonschlinkert/glob-object "Filter an object using glob patterns and dot notation.")
+* [expand-object](https://www.npmjs.com/package/expand-object): Expand a string into a JavaScript object using a simple notation. Use the CLI or… [more](https://github.com/jonschlinkert/expand-object) | [homepage](https://github.com/jonschlinkert/expand-object "Expand a string into a JavaScript object using a simple notation. Use the CLI or as a node.js lib.")
+* [get-value](https://www.npmjs.com/package/get-value): Use property paths (`a.b.c`) to get a nested value from an object. | [homepage](https://github.com/jonschlinkert/get-value "Use property paths (`a.b.c`) to get a nested value from an object.")
+* [engine](https://www.npmjs.com/package/engine): Template engine based on Lo-Dash template, but adds features like the ability to register helpers… [more](https://github.com/jonschlinkert/engine) | [homepage](https://github.com/jonschlinkert/engine "Template engine based on Lo-Dash template, but adds features like the ability to register helpers and more easily set data to be used as context in templates.")
+* [set-value](https://www.npmjs.com/package/set-value): Create nested values and any intermediaries using dot notation (`'a.b.c'`) paths. | [homepage](https://github.com/jonschlinkert/set-value "Create nested values and any intermediaries using dot notation (`'a.b.c'`) paths.")
 
 ## Alternatives
 
 Here are some great libs by other authors. My needs for expand differed enough to create a new library, but these are definitely worth a look:
 
-* [expander](https://www.npmjs.com/package/expander): Expand template strings in declarative configurations. | [homepage](https://github.com/tkellen/expander)  
+* [expander](https://www.npmjs.com/package/expander): Expand template strings in declarative configurations. | [homepage](https://github.com/tkellen/expander "Expand template strings in declarative configurations.")
 
 ## Running tests
+
 Install dev dependencies:
 
 ```sh
-$ npm i -d && npm test
+$ npm install -d && npm test
 ```
 
 ## Contributing
-Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/jonschlinkert/expand/issues/new).
+
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](../../issues/new).
 
 ## Author
+
 **Jon Schlinkert**
 
-+ [github/jonschlinkert](https://github.com/jonschlinkert)
-+ [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
+* [github/jonschlinkert](https://github.com/jonschlinkert)
+* [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
 
 ## License
-Copyright © 2015 [Jon Schlinkert](https://github.com/jonschlinkert)
-Released under the MIT license.
+
+Copyright © 2016, [Jon Schlinkert](https://github.com/jonschlinkert).
+Released under the [MIT license](https://github.com/jonschlinkert/expand/blob/master/LICENSE).
 
 ***
 
-_This file was generated by [verb](https://github.com/verbose/verb) on December 13, 2015._
+_This file was generated by [verb](https://github.com/verbose/verb), v0.9.0, on June 23, 2016._
+
+## Related projects
+
+You might also be interested in these projects:
+
+* [engine](https://www.npmjs.com/package/engine): Template engine based on Lo-Dash template, but adds features like the ability to register helpers… [more](https://github.com/jonschlinkert/engine) | [homepage](https://github.com/jonschlinkert/engine "Template engine based on Lo-Dash template, but adds features like the ability to register helpers and more easily set data to be used as context in templates.")
+* [expand-object](https://www.npmjs.com/package/expand-object): Expand a string into a JavaScript object using a simple notation. Use the CLI or… [more](https://github.com/jonschlinkert/expand-object) | [homepage](https://github.com/jonschlinkert/expand-object "Expand a string into a JavaScript object using a simple notation. Use the CLI or as a node.js lib.")
+* [get-value](https://www.npmjs.com/package/get-value): Use property paths (`a.b.c`) to get a nested value from an object. | [homepage](https://github.com/jonschlinkert/get-value "Use property paths (`a.b.c`) to get a nested value from an object.")
+* [glob-object](https://www.npmjs.com/package/glob-object): Filter an object using glob patterns and dot notation. | [homepage](https://github.com/jonschlinkert/glob-object "Filter an object using glob patterns and dot notation.")
+* [set-value](https://www.npmjs.com/package/set-value): Create nested values and any intermediaries using dot notation (`'a.b.c'`) paths. | [homepage](https://github.com/jonschlinkert/set-value "Create nested values and any intermediaries using dot notation (`'a.b.c'`) paths.")
+
+## Contributing
+
+This document was generated by [verb-readme-generator][] (a [verb][] generator), please don't edit directly. Any changes to the readme must be made in [.verb.md](.verb.md). See [Building Docs](#building-docs).
+
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](../../issues/new).
+
+Or visit the [verb-readme-generator][] project to submit bug reports or pull requests for the readme layout template.
+
+## Building docs
+
+_(This document was generated by [verb-readme-generator][] (a [verb][] generator), please don't edit the readme directly. Any changes to the readme must be made in [.verb.md](.verb.md).)_
+
+Generate readme and API documentation with [verb][]:
+
+```sh
+$ npm install -g verb verb-readme-generator && verb
+```
+
+## Running tests
+
+Install dev dependencies:
+
+```sh
+$ npm install -d && npm test
+```
+
+## Author
+
+**Jon Schlinkert**
+
+* [github/jonschlinkert](https://github.com/jonschlinkert)
+* [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
+
+## License
+
+Copyright © 2016, [Jon Schlinkert](https://github.com/jonschlinkert).
+Released under the [MIT license](https://github.com/jonschlinkert/expand/blob/master/LICENSE).
+
+***
+
+_This file was generated by [verb](https://github.com/verbose/verb), v0.9.0, on June 23, 2016._
