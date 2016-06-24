@@ -93,6 +93,9 @@ function expand(options) {
         str = val;
         break;
       } else {
+        if(tail){
+          tail = resolve(tail,data);
+        }
         str = head + val + tail;
       }
 

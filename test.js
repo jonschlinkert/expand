@@ -230,6 +230,10 @@ describe('expand', function() {
     });
     assert.deepEqual(actual, [{foo: [3, 4, 5, "bar => 1"] }, {f: 6 }, {g: 7 }]);
   });
+
+  it('should process other template on first failure.', function() {
+    assert.strictEqual(expand('<%= c %>:<%= a %>', {a: 'b'}), '<%= c %>:b');
+  });
 });
 
 describe('options', function () {
