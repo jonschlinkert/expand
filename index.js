@@ -110,7 +110,9 @@ function expand(options) {
 
     var val = utils.get(data, prop);
     if (dot) val += '.';
-    if (val) return val;
+    if (typeof val !== 'undefined') {
+      return val;
+    }
 
     // if no `.`, return
     var idx = prop.indexOf('.');
