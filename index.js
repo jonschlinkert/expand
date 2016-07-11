@@ -158,7 +158,7 @@ function expand(options) {
 
     var engine = utils.engine(options);
     if (!utils.regex.test(str)) {
-      return data[str] || str;
+      return str;
     }
 
     try {

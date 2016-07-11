@@ -231,6 +231,48 @@ describe('expand', function() {
   it('should process other template on first failure.', function() {
     assert.strictEqual(expand('<%= c %>:<%= a %>', {a: 'b'}), '<%= c %>:b');
   });
+
+  it('should return value from helpers when value is a key on the context.', function() {
+    assert.strictEqual(expand('<%= a() %><%= b() %><%= c() %>', {
+      a: function() { return this.d; },
+      b: function() { return this.e; },
+      c: function() { return this.f; },
+      d: 'x',
+      e: 'y',
+      f: 'z',
+      x: 'a',
+      y: 'b',
+      z: 'c'
+    }), 'xyz');
+  });
+
+  it('should be able to pass values into helpers.', function() {
+    assert.strictEqual(expand('<%= a(d) %><%= b(e) %><%= c(f) %>', {
+      a: function(prop) { return prop; },
+      b: function(prop) { return prop; },
+      c: function(prop) { return prop; },
+      d: 'x',
+      e: 'y',
+      f: 'z',
+      x: 'a',
+      y: 'b',
+      z: 'c'
+    }), 'xyz');
+  });
+
+  it('should be able to pass values into helpers and use `this` inside helpers.', function() {
+    assert.strictEqual(expand('<%= a(d) %><%= b(e) %><%= c(f) %>', {
+      a: function(prop) { return this[prop]; },
+      b: function(prop) { return this[prop]; },
+      c: function(prop) { return this[prop]; },
+      d: 'x',
+      e: 'y',
+      f: 'z',
+      x: 'a',
+      y: 'b',
+      z: 'c'
+    }), 'abc');
+  });
 });
 
 describe('options', function() {
