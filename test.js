@@ -231,6 +231,20 @@ describe('expand', function() {
   it('should process other template on first failure.', function() {
     assert.strictEqual(expand('<%= c %>:<%= a %>', {a: 'b'}), '<%= c %>:b');
   });
+
+  it('should return value from function when value is a key on the context.', function() {
+    assert.strictEqual(expand('<%= a() %><%= b() %><%= c() %>', {
+      a: function() { return this.d; },
+      b: function() { return this.e; },
+      c: function() { return this.f; },
+      d: 'x',
+      e: 'y',
+      f: 'z',
+      x: 'a',
+      y: 'b',
+      z: 'c'
+    }), 'xyz');
+  });
 });
 
 describe('options', function() {
