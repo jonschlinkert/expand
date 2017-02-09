@@ -21,6 +21,7 @@ function expand(options) {
       }
     }
   }
+
   function values(data, keys) {
     var len = keys.length;
     var vals = new Array(len);
@@ -51,7 +52,7 @@ function expand(options) {
       var val = match;
       var i = m.index;
 
-      if (/[()]/.test(prop)) {
+      if (/\([^)]*?\)/.test(prop)) {
         try {
           val = interpolate(prop)(data);
         } catch (err) {
@@ -76,11 +77,15 @@ function expand(options) {
       // ensure we have a string. numbers are the most
       // likely thing to blow this up at this point
       } else if (typeof val !== 'function') {
-        val = val.toString();
+        val = String(val);
       }
 
       if (typeof val === 'function') {
-        return val.bind(data);
+        if (typeof options.resolver === 'function') {
+          val = options.resolver(val, data);
+        } else {
+          val = val.call(data, data);
+        }
       }
 
       var head = str.slice(0, i) || '';

@@ -50,11 +50,11 @@ describe('expand', function() {
     assert.deepEqual(expand(two, one).foo, 'd');
   });
 
-  it('should return a function bound to the context.', function() {
+  it('should call a property that resolves to a function', function() {
     var ctx = {
       word: 'foo',
-      addFoo: function(str) {
-        return str + this.word;
+      addFoo: function() {
+        return 'bar';
       }
     };
 
@@ -62,7 +62,7 @@ describe('expand', function() {
       foo: '<%= addFoo %>'
     };
 
-    assert.equal(expand(two, ctx).foo('bar'), 'barfoo');
+    assert.deepEqual(expand(two, ctx), {foo: 'bar'});
   });
 
   it('should recursively expand templates.', function() {
